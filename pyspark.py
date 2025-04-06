@@ -83,12 +83,86 @@ df = df.filter(col("col1").like("Tej%")) #select * from table where col like 'Te
 
 #groupby
 df = df.groupBy(col("col1").sum("col2") #select col1 , sum(col2 ) from table group by col1
+df = df.groupBy(["col1", "col2"]) .sum("col1")
 
 #orderby
 
 df = df.orderBy(col("col1")) #select * from table order by col1 
 from pyspark.sql.functions import col, desc
 df = df.orderBy(col("col1").desc()) #select * from table order by col1 desc
+
+#Joins
+
+df = spark.read.csv("path")
+df2= spark.read.csv("path")
+
+df_join = df.join(df2, df.id == df2.id, "inner")
+
+df_join = df.join(df2, df.id == df2.id, "left")
+
+df_join = df.join(df2, df.id == df2.id, "leftanti")
+
+#broadcastjoin
+from pyspark.sql.functions import col, desc, broadcast
+df_join = df.join(broadcast(df2), df.id == df2.id, "inner")
+
+
+#window functions
+
+from pyspark.sql import window
+from pyspark.sql.functions import desc, dense_rank, col
+
+#select *, dense_rank() over(order by col) as rank from table name
+df = spark.read.csv("path")
+
+window_df = window.partitionBy("dept").orderBy(col("salary")).desc())
+df2 = df.withColumn("rank", dense_rank(). over(window_df))
+
+df_filter = df2.filter(col("rank") == 2)
+
+#aggregation window functions
+#select *, sum(salary) over(partition by dept order by salary desc) as total_salary from table
+from pyspark.sql import window
+from pyspark.sql.functions import desc, dense_rank, col
+
+#select *, dense_rank() over(order by col) as rank from table name
+#rolling sum/cumulative sum
+
+df = spark.read.csv("path")
+
+window_df = window.orderBy(col("salary")).desc())
+df2 = df.withColumn("totalsalary", sum("salary"). over(window_df))
+
+df_filter = df2.filter(col("rank") == 2)
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#lead, lag
+from pyspark.sql import window
+from pyspark.sql.functions import desc, dense_rank, col, lead, lag
+
+#select *, dense_rank() over(order by col) as rank from table name
+df = spark.read.csv("path")
+
+window_df = window.orderBy(col("salary")).desc())
+df2 = df.withColumn("next_row", lead("salary"). over(window_df))
+
+
+df = spark.read.csv("path")
+
+window_df = window.orderBy(col("salary")).desc())
+df2 = df.withColumn("next_row", lag("salary"). over(window_df))
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
 
 
                 
